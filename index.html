@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Maya Photobooth — Universitas Mayasari Bakti</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Hidden print target (visible only in @media print) -->
+  <div id="print-sheet" aria-hidden="true">
+    <img id="print-image" alt="Hasil Maya Photobooth" />
+  </div>
+
+  <!-- Top Navigation / Studio Header -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <button class="brand" id="btn-brand-home" type="button" title="Kembali ke Pilih Frame">
+        <span class="brand-mark">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/>
+            <circle cx="12" cy="13" r="3"/>
+          </svg>
+        </span>
+        <span class="brand-text">
+          <strong>Maya Photobooth</strong>
+          <small>Universitas Mayasari Bakti</small>
+        </span>
+      </button>
+
+      <nav class="stepper" aria-label="Langkah Photobooth">
+        <button class="step-pill active" data-step="frames" type="button">
+          <span class="step-num">1</span>
+          <span class="step-label">Pilih Frame</span>
+        </button>
+        <span class="step-divider" aria-hidden="true"></span>
+        <button class="step-pill" data-step="camera" type="button">
+          <span class="step-num">2</span>
+          <span class="step-label">Sesi Foto</span>
+        </button>
+        <span class="step-divider" aria-hidden="true"></span>
+        <button class="step-pill" data-step="result" type="button" id="step-result-btn" disabled>
+          <span class="step-num">3</span>
+          <span class="step-label">Hasil &amp; Cetak</span>
+        </button>
+      </nav>
+
+      <div class="topbar-actions">
+        <button class="btn btn-ghost btn-sm" id="btn-open-gallery" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+            <circle cx="8.5" cy="8.5" r="1.5"/>
+            <polyline points="21 15 16 10 5 21"/>
+          </svg>
+          <span>Galeri</span>
+          <span class="badge-count" id="gallery-count">0</span>
+        </button>
+
+        <button class="btn btn-ghost btn-sm" id="btn-open-admin" type="button" title="Rekap Biodata & Pengaturan Panitia">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+          <span>Panitia</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-shell">
+    <!-- ==================== STEP 1: PILIH FRAME ==================== -->
+    <section class="view active" id="view-frames" aria-label="Pilih Frame Photobooth">
+      <div class="frames-hero">
+        <div>
+          <span class="eyebrow">25 Desain Frame Canva • Resolusi 4R HD (1200×1800)</span>
+          <h1>Pilih Frame Favoritmu</h1>
+          <p class="hero-sub">Semua frame dari koleksi <strong>Different Pieces</strong> siap dipakai — otomatis tersusun rapi di balik ornamen &amp; logo desainmu.</p>
+        </div>
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input type="search" id="frame-search" placeholder="Cari frame (LEGO, Little Prince, Hukum, Teknik...)" autocomplete="off" />
+        </div>
+      </div>
+
+      <div class="category-bar" id="category-tabs" role="tablist"></div>
+
+      <div class="frames-layout">
+        <div class="frames-grid" id="frames-grid"></div>
+
+        <aside class="frame-preview-panel">
+          <div class="preview-card">
+            <div class="preview-stage">
+              <img id="selected-frame-img" src="" alt="Preview frame terpilih" />
+            </div>
+            <div class="preview-meta">
+              <div class="preview-title-row">
+                <h2 id="selected-frame-name">Memuat...</h2>
+                <span class="chip chip-emerald" id="selected-frame-badge">3 Foto</span>
+              </div>
+              <p class="preview-desc" id="selected-frame-desc"></p>
+
+              <div class="strip-mode-box" id="strip-mode-box">
+                <label class="toggle-row">
+                  <input type="checkbox" id="toggle-duplicate-strip" checked />
+                  <span class="toggle-switch"></span>
+                  <span class="toggle-text">
+                    <strong>Duplikat Strip Kiri &amp; Kanan</strong>
+                    <small>Foto otomatis terisi sama di kedua strip (standar cetak 2×6&quot;)</small>
+                  </span>
+                </label>
+              </div>
+
+              <button class="btn btn-primary btn-lg btn-block" id="btn-start-session" type="button">
+                <span>Mulai Sesi Foto</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+                  <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ==================== STEP 2: SESI FOTO ==================== -->
+    <section class="view" id="view-camera" aria-label="Sesi Foto Kamera">
+      <div class="studio-layout">
+        <div class="camera-column">
+          <div class="camera-toolbar">
+            <div class="toolbar-group">
+              <button class="btn btn-ghost btn-sm" id="btn-back-frames" type="button">
+                ← Ganti Frame
+              </button>
+              <span class="active-frame-pill" id="camera-frame-label">Frame</span>
+            </div>
+
+            <div class="toolbar-group">
+              <div class="segmented" id="timer-selector" title="Timer hitung mundur">
+                <button type="button" data-timer="0">Manual</button>
+                <button type="button" data-timer="3" class="active">3 dtk</button>
+                <button type="button" data-timer="5">5 dtk</button>
+                <button type="button" data-timer="10">10 dtk</button>
+              </div>
+
+              <button class="icon-btn active" id="btn-mirror" type="button" title="Mirror Kamera (Selfie)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path d="M12 3v18"/><path d="M8 7l-5 5 5 5V7z"/><path d="M16 7l5 5-5 5V7z"/>
+                </svg>
+                <span>Mirror</span>
+              </button>
+
+              <button class="icon-btn" id="btn-switch-cam" type="button" title="Ganti Kamera Depan/Belakang" hidden>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                  <path d="M3 3v5h5"/>
+                  <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/>
+                  <path d="M16 16h5v5"/>
+                </svg>
+              </button>
+
+              <button class="icon-btn active" id="btn-sound" type="button" title="Suara Countdown & Shutter">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                  <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="camera-stage" id="camera-stage">
+            <video id="camera-video" autoplay playsinline muted></video>
+            <div class="crop-guide" id="crop-guide" aria-hidden="true">
+              <div class="crop-frame" id="crop-frame">
+                <span class="crop-label" id="crop-label">Area Foto Slot 1</span>
+              </div>
+            </div>
+
+            <div class="shot-status-badge" id="shot-status-badge">
+              Foto <strong id="shot-current">1</strong> / <span id="shot-total">3</span>
+            </div>
+
+            <div class="countdown-overlay" id="countdown-overlay" hidden>
+              <span class="countdown-number" id="countdown-number">3</span>
+              <span class="countdown-hint">Senyum!</span>
+            </div>
+
+            <div class="flash-overlay" id="flash-overlay"></div>
+
+            <div class="camera-fallback" id="camera-fallback" hidden>
+              <div class="fallback-card">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                  <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/>
+                  <line x1="2" y1="2" x2="22" y2="22"/>
+                </svg>
+                <h3>Kamera Tidak Aktif</h3>
+                <p id="camera-error-msg">Izinkan akses kamera di browser atau gunakan tombol Upload Foto di bawah untuk mengisi frame dari galeri perangkatmu.</p>
+                <div class="fallback-actions">
+                  <button class="btn btn-primary btn-sm" id="btn-retry-camera" type="button">Coba Aktifkan Kamera</button>
+                  <button class="btn btn-secondary btn-sm" id="btn-fallback-upload" type="button">Upload Foto dari Galeri</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Filter Strip -->
+          <div class="filter-bar" id="camera-filter-bar" aria-label="Pilih Filter Warna"></div>
+
+          <!-- Shutter Action Bar -->
+          <div class="shutter-bar">
+            <button class="btn btn-secondary" id="btn-upload-photos" type="button" title="Pilih foto dari perangkat">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+              <span>Upload Foto</span>
+            </button>
+            <input type="file" id="file-upload-input" accept="image/*" multiple hidden />
+            <input type="file" id="single-slot-upload" accept="image/*" hidden />
+
+            <div class="shutter-center">
+              <button class="shutter-btn" id="btn-auto-shoot" type="button" title="Mulai Auto-Foto semua slot">
+                <span class="shutter-ring"></span>
+                <span class="shutter-core"></span>
+              </button>
+              <span class="shutter-caption" id="shutter-caption">Mulai Foto</span>
+            </div>
+
+            <div class="shutter-right">
+              <button class="btn btn-ghost btn-sm" id="btn-single-snap" type="button" title="Jepret 1 slot saja">
+                Jepret 1×
+              </button>
+              <button class="btn btn-primary" id="btn-go-result" type="button" disabled>
+                Lanjut Hasil →
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Live Composite Preview Sidebar -->
+        <aside class="live-sidebar">
+          <div class="sidebar-card">
+            <div class="sidebar-header">
+              <h3>Preview Langsung</h3>
+              <button class="btn-link" id="btn-reset-shots" type="button">Reset Foto</button>
+            </div>
+            <div class="live-canvas-wrap">
+              <canvas id="live-preview-canvas" width="600" height="900"></canvas>
+            </div>
+            <div class="slots-strip">
+              <div class="slots-strip-head">
+                <span>Slot Foto</span>
+                <small>Klik slot untuk retake / ganti</small>
+              </div>
+              <div class="slot-thumbs" id="slot-thumbs"></div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ==================== STEP 3: HASIL & CETAK ==================== -->
+    <section class="view" id="view-result" aria-label="Hasil Photobooth dan Cetak">
+      <div class="result-layout">
+        <div class="result-stage-col">
+          <div class="result-paper">
+            <canvas id="result-canvas" width="1200" height="1800"></canvas>
+            <div class="preview-lock-banner" id="preview-lock-banner" hidden>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+              <span>Isi biodata singkat di samping untuk membuka Download &amp; Cetak HD</span>
+            </div>
+          </div>
+          <p class="result-resolution-note">Output Resolusi Tinggi • 1200 × 1800 px (Standar Cetak 4R / 300 DPI)</p>
+        </div>
+
+        <aside class="result-controls-col">
+          <div class="control-card">
+            <div class="control-header">
+              <h2 id="result-heading">Keren Banget Hasilnya!</h2>
+              <p id="result-frame-subtitle">Frame terpilih</p>
+            </div>
+
+            <!-- Biodata Gate Form (shown when locked after photo) -->
+            <div class="biodata-box" id="result-biodata-box" hidden>
+              <div class="biodata-box-head">
+                <span class="chip chip-gold">Langkah Terakhir</span>
+                <h3>Isi Biodata untuk Buka Download &amp; Cetak HD</h3>
+                <p>Data kamu membantu tim PMB Universitas Mayasari Bakti berbagi info beasiswa &amp; acara kampus.</p>
+              </div>
+
+              <form class="biodata-form" id="result-biodata-form" novalidate>
+                <div class="form-field">
+                  <label for="bio-nama">Nama Lengkap <span class="req">*</span></label>
+                  <input type="text" id="bio-nama" name="nama" placeholder="Contoh: Raka Pratama" required autocomplete="name" />
+                </div>
+
+                <div class="form-field">
+                  <label for="bio-sekolah">Asal SMA / SMK / MA <span class="req">*</span></label>
+                  <input type="text" id="bio-sekolah" name="asalSekolah" placeholder="Contoh: SMAN 1 Tasikmalaya" required />
+                </div>
+
+                <div class="form-row-2">
+                  <div class="form-field">
+                    <label for="bio-kelas">Kelas</label>
+                    <select id="bio-kelas" name="kelas">
+                      <option value="">Pilih (opsional)</option>
+                      <option value="Kelas 12">Kelas 12</option>
+                      <option value="Kelas 11">Kelas 11</option>
+                      <option value="Kelas 10">Kelas 10</option>
+                      <option value="Alumni / Gap Year">Alumni / Gap Year</option>
+                      <option value="Mahasiswa / Umum">Mahasiswa / Umum</option>
+                    </select>
+                  </div>
+                  <div class="form-field">
+                    <label for="bio-prodi">Minat Prodi</label>
+                    <select id="bio-prodi" name="minatProdi">
+                      <option value="">Pilih (opsional)</option>
+                      <option value="Bisnis Digital">Bisnis Digital</option>
+                      <option value="Usaha Perjalanan Wisata">Usaha Perjalanan Wisata</option>
+                      <option value="Akuntansi Lembaga Keuangan Syariah">Akuntansi Syariah (ALKS)</option>
+                      <option value="Manajemen">Manajemen</option>
+                      <option value="Kewirausahaan">Kewirausahaan</option>
+                      <option value="Ilmu Hukum">Ilmu Hukum</option>
+                      <option value="Teknik Mekatronika">Teknik Mekatronika</option>
+                      <option value="Teknik Mesin">Teknik Mesin</option>
+                      <option value="Teknik Informatika">Teknik Informatika</option>
+                      <option value="Belum Menentukan">Belum Menentukan</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-field">
+                  <label for="bio-email">Email Aktif <span class="req">*</span></label>
+                  <input type="email" id="bio-email" name="email" placeholder="nama@email.com" required autocomplete="email" />
+                </div>
+
+                <div class="form-field">
+                  <label for="bio-hp">Nomor HP / WhatsApp <span class="req">*</span></label>
+                  <input type="tel" id="bio-hp" name="noHp" placeholder="08xxxxxxxxxx" required autocomplete="tel" />
+                </div>
+
+                <p class="form-error" id="result-biodata-error" hidden></p>
+
+                <button class="btn btn-primary btn-lg btn-block" id="btn-submit-biodata" type="submit">
+                  <span>Simpan &amp; Buka Download HD</span>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                </button>
+              </form>
+            </div>
+
+            <!-- Unlocked Banner + Download & Print Primary Actions -->
+            <div class="unlocked-area" id="result-unlocked-area">
+              <div class="unlocked-banner" id="unlocked-banner" hidden>
+                <div class="unlocked-banner-text">
+                  <strong>✓ Biodata tersimpan!</strong>
+                  <small id="unlocked-user-summary"></small>
+                </div>
+                <button class="btn-link" id="btn-add-friend-bio" type="button">+ Data Teman</button>
+              </div>
+
+              <div class="download-actions">
+                <button class="btn btn-primary btn-lg btn-block" id="btn-download-png" type="button">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+                  </svg>
+                  <span>Download HD 4R (PNG)</span>
+                </button>
+
+                <div class="download-row-2">
+                  <button class="btn btn-secondary" id="btn-download-jpg" type="button">
+                    Download JPG
+                  </button>
+                  <button class="btn btn-gold" id="btn-print-4r" type="button">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                      <polyline points="6 9 6 2 18 2 18 9"/>
+                      <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+                      <rect x="6" y="14" width="12" height="8"/>
+                    </svg>
+                    <span>Cetak 4R</span>
+                  </button>
+                </div>
+
+                <!-- Single strip download buttons (shown only for double-strip frames) -->
+                <div class="single-strip-downloads" id="single-strip-downloads" hidden>
+                  <span class="mini-label">Atau download 1 strip (siap IG Story / WA):</span>
+                  <div class="download-row-2">
+                    <button class="btn btn-ghost btn-sm" id="btn-download-left-strip" type="button">
+                      Download Strip Kiri
+                    </button>
+                    <button class="btn btn-ghost btn-sm" id="btn-download-right-strip" type="button">
+                      Download Strip Kanan
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <hr class="divider" />
+
+            <!-- Post-capture Filter -->
+            <div class="control-section">
+              <label class="section-label">Filter Warna</label>
+              <div class="filter-bar compact" id="result-filter-bar"></div>
+            </div>
+
+            <!-- Rotate 90 toggle (only for horizontal-oriented frames like Little Prince Strip & Boarding Pass Strip) -->
+            <div class="control-section" id="rotate-option-box" hidden>
+              <label class="toggle-row">
+                <input type="checkbox" id="toggle-rotate-90" checked />
+                <span class="toggle-switch"></span>
+                <span class="toggle-text">
+                  <strong>Putar Foto 90° Sesuai Arah Desain</strong>
+                  <small>Menyesuaikan orientasi horizontal teks &amp; tiket pada frame ini</small>
+                </span>
+              </label>
+            </div>
+
+            <!-- Quick Frame Switcher (try another frame without re-shooting!) -->
+            <div class="control-section">
+              <label class="section-label">Coba Frame Lain (Tanpa Foto Ulang)</label>
+              <div class="quick-frames" id="result-quick-frames"></div>
+            </div>
+
+            <!-- Edit Individual Slots -->
+            <div class="control-section">
+              <label class="section-label">Ganti / Ulang Foto Tertentu</label>
+              <div class="slot-thumbs" id="result-slot-thumbs"></div>
+            </div>
+
+            <hr class="divider" />
+
+            <div class="result-footer-actions">
+              <button class="btn btn-ghost" id="btn-back-camera" type="button">← Kembali ke Kamera</button>
+              <button class="btn btn-secondary" id="btn-new-session" type="button">Sesi Foto Baru</button>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <!-- ==================== PRE-SESSION BIODATA MODAL (if admin switches mode to "before") ==================== -->
+  <div class="modal-backdrop" id="pre-biodata-modal" hidden>
+    <div class="modal-dialog modal-sm" role="dialog" aria-modal="true" aria-labelledby="pre-bio-title">
+      <div class="modal-header">
+        <div>
+          <span class="chip chip-emerald" style="margin-bottom:6px;display:inline-block;">Selamat Datang di Maya Photobooth</span>
+          <h2 id="pre-bio-title">Registrasi Singkat Sebelum Foto</h2>
+          <small>Universitas Mayasari Bakti — Isi datamu dulu ya sebelum memilih frame</small>
+        </div>
+      </div>
+      <div class="modal-body-stack">
+        <form class="biodata-form" id="pre-biodata-form" novalidate>
+          <div class="form-field">
+            <label for="pre-nama">Nama Lengkap <span class="req">*</span></label>
+            <input type="text" id="pre-nama" name="nama" placeholder="Contoh: Raka Pratama" required autocomplete="name" />
+          </div>
+          <div class="form-field">
+            <label for="pre-sekolah">Asal SMA / SMK / MA <span class="req">*</span></label>
+            <input type="text" id="pre-sekolah" name="asalSekolah" placeholder="Contoh: SMAN 1 Tasikmalaya" required />
+          </div>
+          <div class="form-row-2">
+            <div class="form-field">
+              <label for="pre-kelas">Kelas</label>
+              <select id="pre-kelas" name="kelas">
+                <option value="">Pilih (opsional)</option>
+                <option value="Kelas 12">Kelas 12</option>
+                <option value="Kelas 11">Kelas 11</option>
+                <option value="Kelas 10">Kelas 10</option>
+                <option value="Alumni / Gap Year">Alumni / Gap Year</option>
+                <option value="Mahasiswa / Umum">Mahasiswa / Umum</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label for="pre-prodi">Minat Prodi</label>
+              <select id="pre-prodi" name="minatProdi">
+                <option value="">Pilih (opsional)</option>
+                <option value="Bisnis Digital">Bisnis Digital</option>
+                <option value="Usaha Perjalanan Wisata">Usaha Perjalanan Wisata</option>
+                <option value="Akuntansi Lembaga Keuangan Syariah">Akuntansi Syariah (ALKS)</option>
+                <option value="Manajemen">Manajemen</option>
+                <option value="Kewirausahaan">Kewirausahaan</option>
+                <option value="Ilmu Hukum">Ilmu Hukum</option>
+                <option value="Teknik Mekatronika">Teknik Mekatronika</option>
+                <option value="Teknik Mesin">Teknik Mesin</option>
+                <option value="Teknik Informatika">Teknik Informatika</option>
+                <option value="Belum Menentukan">Belum Menentukan</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-field">
+            <label for="pre-email">Email Aktif <span class="req">*</span></label>
+            <input type="email" id="pre-email" name="email" placeholder="nama@email.com" required autocomplete="email" />
+          </div>
+          <div class="form-field">
+            <label for="pre-hp">Nomor HP / WhatsApp <span class="req">*</span></label>
+            <input type="tel" id="pre-hp" name="noHp" placeholder="08xxxxxxxxxx" required autocomplete="tel" />
+          </div>
+          <p class="form-error" id="pre-biodata-error" hidden></p>
+          <button class="btn btn-primary btn-lg btn-block" type="submit">Lanjut ke Photobooth →</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== ADMIN / PANITIA MODAL ==================== -->
+  <div class="modal-backdrop" id="admin-modal" hidden>
+    <div class="modal-dialog modal-lg" role="dialog" aria-modal="true" aria-labelledby="admin-title">
+      <div class="modal-header">
+        <div>
+          <h2 id="admin-title">Panel Panitia — Rekap Biodata &amp; Pengaturan</h2>
+          <small>Data tersimpan otomatis ke <code>data/biodata.csv</code> (siap buka di Microsoft Excel)</small>
+        </div>
+        <button class="icon-btn" id="btn-close-admin" type="button" aria-label="Tutup">✕</button>
+      </div>
+
+      <!-- PIN Gate -->
+      <div class="modal-body-stack" id="admin-pin-gate">
+        <form class="pin-box" id="admin-pin-form">
+          <h3>Masukkan PIN Panitia</h3>
+          <p>PIN default: <code>1234</code> (bisa diubah lewat env <code>ADMIN_PIN</code> di server)</p>
+          <div class="pin-row">
+            <input type="password" id="admin-pin-input" inputmode="numeric" placeholder="PIN (default 1234)" autocomplete="off" required />
+            <button class="btn btn-primary" type="submit">Masuk</button>
+          </div>
+          <p class="form-error" id="admin-pin-error" hidden></p>
+        </form>
+      </div>
+
+      <!-- Admin Content -->
+      <div class="modal-body-stack" id="admin-content" hidden>
+        <div class="admin-settings-bar">
+          <div>
+            <strong>Posisi Form Biodata:</strong>
+            <small>Atur kapan pengunjung diminta mengisi biodata</small>
+          </div>
+          <div class="segmented" id="biodata-mode-selector">
+            <button type="button" data-mode="after" class="active">Sesudah Foto (Disarankan)</button>
+            <button type="button" data-mode="before">Sebelum Foto</button>
+            <button type="button" data-mode="off">Nonaktif</button>
+          </div>
+        </div>
+
+        <div class="admin-stats-row">
+          <div class="stat-card">
+            <span class="stat-label">Total Peserta</span>
+            <strong class="stat-value" id="stat-total-leads">0</strong>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Asal Sekolah Unik</span>
+            <strong class="stat-value" id="stat-unique-schools">0</strong>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Prodi Terfavorit</span>
+            <strong class="stat-value stat-value-sm" id="stat-top-prodi">-</strong>
+          </div>
+        </div>
+
+        <div class="admin-table-toolbar">
+          <input type="search" id="admin-search" class="admin-search-input" placeholder="Cari nama, sekolah, email, atau WA..." />
+          <div class="admin-toolbar-btns">
+            <button class="btn btn-secondary btn-sm" id="btn-refresh-leads" type="button">Refresh</button>
+            <button class="btn btn-primary btn-sm" id="btn-export-csv" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              <span>Download Excel (CSV)</span>
+            </button>
+            <button class="btn btn-ghost btn-sm btn-danger-text" id="btn-clear-leads" type="button">Hapus Semua</button>
+          </div>
+        </div>
+
+        <div class="admin-table-wrap">
+          <table class="leads-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Waktu</th>
+                <th>Nama</th>
+                <th>Asal SMA/SMK</th>
+                <th>Kelas / Prodi</th>
+                <th>Email</th>
+                <th>No. HP / WA</th>
+                <th>Frame</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="admin-leads-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Session Gallery Modal -->
+  <div class="modal-backdrop" id="gallery-modal" hidden>
+    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="gallery-title">
+      <div class="modal-header">
+        <div>
+          <h2 id="gallery-title">Galeri Sesi Ini</h2>
+          <small>Foto yang sudah diambil tersimpan sementara selama tab browser terbuka</small>
+        </div>
+        <button class="icon-btn" id="btn-close-gallery" type="button" aria-label="Tutup">✕</button>
+      </div>
+      <div class="modal-body" id="gallery-grid"></div>
+    </div>
+  </div>
+
+  <!-- Toast notification -->
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

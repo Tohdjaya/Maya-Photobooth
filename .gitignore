@@ -1,0 +1,11 @@
+# Biodata peserta event (berisi data pribadi — jangan dipush ke repo publik)
+data/leads.json
+data/biodata.csv
+
+# OS, Arsip & Editor
+*.zip
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log
+node_modules/
